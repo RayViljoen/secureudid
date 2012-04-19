@@ -159,7 +159,7 @@ BOOL          SUUIDValidOwnerObject(id object);
             // http://en.wikipedia.org/wiki/Universally_unique_identifier
             CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
             
-            // Auto detect ARC and handle idetifier accordingly
+            // Auto detect ARC
             #if __has_feature(objc_arc)
             identifier = (__bridge NSString*)CFUUIDCreateString(kCFAllocatorDefault, uuid);
             #else
@@ -236,7 +236,7 @@ NSData *SUUIDCryptorToData(CCOperation operation, NSData *value, NSData *key) {
     
     if (cryptStatus == kCCSuccess) {
         
-        // Auto detect ARC and handle idetifier accordingly
+        // Auto detect ARC
         #if __has_feature(objc_arc)
         return [[NSData alloc] initWithBytes:output.bytes length:numBytes];
         #else
@@ -259,7 +259,7 @@ NSString *SUUIDCryptorToString(CCOperation operation, NSData *value, NSData *key
         return nil;
     }
     
-    // Auto detect ARC and handle idetifier accordingly
+    // Auto detect ARC
     #if __has_feature(objc_arc)
     return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     #else
