@@ -37,6 +37,13 @@
 #define SUUID_SCHEMA_VERSION        (1)
 #define SUUID_MAX_STORAGE_LOCATIONS (64)
 
+#ifndef __has_feature
+// Not LLVM
+#define __has_feature(x) 0
+// Using __has_feature for ARC detection 
+#endif
+
+
 NSString *const SUUIDDefaultIdentifier   = @"00000000-0000-0000-0000-000000000000";
 
 NSString *const SUUIDTypeDataDictionary  = @"public.secureudid";
@@ -151,7 +158,14 @@ BOOL          SUUIDValidOwnerObject(id object);
             // Otherwise, create a new RFC-4122 Version 4 UUID
             // http://en.wikipedia.org/wiki/Universally_unique_identifier
             CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+            
+            // Auto detect ARC and handle idetifier accordingly
+            #if __has_feature(objc_arc)
+            identifier = (__bridge NSString*)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+            #else
             identifier = [(NSString*)CFUUIDCreateString(kCFAllocatorDefault, uuid) autorelease];
+            #endif
+            
             CFRelease(uuid);
             
             // Encrypt it for storage.
@@ -221,7 +235,13 @@ NSData *SUUIDCryptorToData(CCOperation operation, NSData *value, NSData *key) {
                                           &numBytes);
     
     if (cryptStatus == kCCSuccess) {
+        
+        // Auto detect ARC and handle idetifier accordingly
+        #if __has_feature(objc_arc)
+        return [[NSData alloc] initWithBytes:output.bytes length:numBytes];
+        #else
         return [[[NSData alloc] initWithBytes:output.bytes length:numBytes] autorelease];
+        #endif
     }
     
     return nil;
@@ -239,7 +259,12 @@ NSString *SUUIDCryptorToString(CCOperation operation, NSData *value, NSData *key
         return nil;
     }
     
+    // Auto detect ARC and handle idetifier accordingly
+    #if __has_feature(objc_arc)
+    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    #else
     return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+    #endif
 }
 
 /*
